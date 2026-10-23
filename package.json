@@ -1,0 +1,58 @@
+{
+  "name": "nowplaying",
+  "version": "1.0.0",
+  "description": "Chrome で再生中の曲を、デスクトップのウィジェットと Discord に表示する Windows 用アプリ",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node test/discord-test.js",
+    "send": "node test/send.js",
+    "dist": "electron-builder --win portable --publish never"
+  },
+  "dependencies": {
+    "koffi": "^3.3.3",
+    "ws": "^8.22.0"
+  },
+  "license": "MIT",
+  "os": [
+    "win32"
+  ],
+  "devDependencies": {
+    "electron": "^45.0.0",
+    "electron-builder": "^26.15.3"
+  },
+  "author": "AliceRiver",
+  "build": {
+    "appId": "io.github.aliceriver.nowplaying",
+    "productName": "NowPlaying",
+    "files": [
+      "main.js",
+      "acrylic.js",
+      "discord.js",
+      "png.js",
+      "wnp.js",
+      "preload.js",
+      "widget.html",
+      "widget.js",
+      "settings.html",
+      "settings.js"
+    ],
+    "asarUnpack": [
+      "node_modules/koffi/**/*.node"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "build/icon.png"
+    },
+    "portable": {
+      "artifactName": "NowPlaying.exe"
+    },
+    "directories": {
+      "output": "dist"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alice-river/NowPlaying.git"
+  }
+}

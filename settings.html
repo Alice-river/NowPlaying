@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'self'">
+<title>NowPlaying 設定</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body {
+    box-sizing: border-box; padding: 20px; background: #15161d; color: #e6e7ee;
+    font-family: "Segoe UI Variable", "Segoe UI", "Yu Gothic UI", "Meiryo UI", sans-serif; font-size: 14px;
+  }
+  h1 { margin: 0 0 16px; font-size: 16px; font-weight: 600; }
+  .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  label { font-weight: 500; }
+  output { font-variant-numeric: tabular-nums; color: #b6bdff; min-width: 3.5em; text-align: right; }
+  input[type=range] { width: 100%; margin: 4px 0 2px; accent-color: #8c96ff; }
+  .scale { display: flex; justify-content: space-between; font-size: 12px; color: #9a9cac; }
+  .check { display: flex; align-items: center; gap: 8px; margin-top: 16px; font-weight: 400; }
+  .check input { accent-color: #8c96ff; width: 16px; height: 16px; }
+  hr { border: 0; border-top: 1px solid #2c2d3a; margin: 20px 0 16px; }
+  .field { display: block; margin: 14px 0 6px; }
+  input[type=text] { box-sizing: border-box; width: 100%; padding: 7px 9px; border-radius: 6px; border: 1px solid #3a3c4c; background: #1d1e27; color: #e6e7ee; font: inherit; }
+  p { margin: 14px 0 0; font-size: 12px; line-height: 1.6; color: #9a9cac; }
+  button {
+    margin-top: 16px; padding: 6px 14px; border-radius: 6px; border: 1px solid #3a3c4c;
+    background: #23242e; color: #e6e7ee; font: inherit; cursor: pointer;
+  }
+  button:hover { background: #2c2d3a; }
+  :focus-visible { outline: 2px solid #8c96ff; outline-offset: 2px; }
+</style>
+</head>
+<body>
+  <h1>ウィジェットの設定</h1>
+  <div class="row">
+    <label for="t">透過率</label>
+    <output id="v" for="t">25%</output>
+  </div>
+  <input id="t" type="range" min="0" max="100" step="1" value="25">
+  <div class="scale"><span>濃い</span><span>透明</span></div>
+  <label class="check"><input id="blur" type="checkbox" checked> 後ろをぼかす (すりガラス)</label>
+  <p>オフにすると、後ろの文字がそのまま透けて見えます。変更はすぐ反映され、再生していないときは確認用の表示が出ます。</p>
+  <button id="reset" type="button">初期値に戻す</button>
+  <hr>
+  <h1>Discord</h1>
+  <label class="check"><input id="dc-on" type="checkbox" checked> 「再生中」に表示する</label>
+  <label class="field" for="dc-id">Application ID</label>
+  <input id="dc-id" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="例: 123456789012345678">
+  <p id="dc-status">状態: 確認中</p>
+  <p>Discord のデスクトップアプリが、この PC で起動している必要があります。ID は、Discord Developer Portal の「General Information」にあります。</p>
+  <hr>
+  <h1>一般</h1>
+  <label class="check" style="margin-top:0"><input id="auto" type="checkbox"> Windows の起動時に自動で起動する</label>
+  <script src="settings.js"></script>
+</body>
+</html>
