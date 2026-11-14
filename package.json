@@ -1,6 +1,6 @@
 {
   "name": "nowplaying",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Chrome で再生中の曲を、デスクトップのウィジェットと Discord に表示する Windows 用アプリ",
   "main": "main.js",
   "scripts": {
