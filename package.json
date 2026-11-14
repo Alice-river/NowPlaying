@@ -31,6 +31,8 @@
       "discord.js",
       "png.js",
       "wnp.js",
+      "spotify.js",
+      "spotify-smtc.ps1",
       "preload.js",
       "widget.html",
       "widget.js",
@@ -38,7 +40,8 @@
       "settings.js"
     ],
     "asarUnpack": [
-      "node_modules/koffi/**/*.node"
+      "node_modules/koffi/**/*.node",
+      "spotify-smtc.ps1"
     ],
     "win": {
       "target": "portable",

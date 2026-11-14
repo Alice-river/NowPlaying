@@ -6,6 +6,7 @@ const { Wnp, HANDSHAKE } = require('./wnp');
 const { trayIconPng } = require('./png');
 const { setAcrylic, clearAcrylic } = require('./acrylic');
 const { DiscordPresence } = require('./discord');
+const { SpotifySource } = require('./spotify');
 
 const PORT = Number(process.env.NP_PORT) || 37250;
 const DEBUG = process.env.NP_DEBUG === '1';
@@ -21,6 +22,9 @@ if (process.env.NP_USERDATA) app.setPath('userData', process.env.NP_USERDATA);
 if (!app.requestSingleInstanceLock()) app.quit();
 
 const wnp = new Wnp();
+const spotify = new SpotifySource({ log });
+// Spotify デスクトップが起動して曲の情報があれば、Web (WebNowPlaying) より優先する
+const currentView = () => spotify.view() || wnp.view();
 const sockets = new Set();
 let win = null;
 let tray = null;
@@ -30,7 +34,7 @@ let settingsWin = null;
 let previewOn = false;
 let saveTimer = null;
 let settings = { x: null, y: null, clickThrough: false, transparency: 25, blur: true,
-  discord: true, discordAppId: '' };
+  discord: true, discordAppId: '', spotify: true };
 
 const clampPercent = (v) => Math.min(100, Math.max(0, Math.round(Number(v)) || 0));
 // 透過率が高いほど、暗い色の重ねを薄くする
@@ -116,7 +120,7 @@ function pushConfig() {
 
 function pushState() {
   if (!win || win.isDestroyed()) return;
-  const real = wnp.view();
+  const real = currentView();
   const view = real || (previewOn ? sampleView() : null);
   if (view) win.webContents.send('state', view);
   applyVisibility(view);
@@ -137,7 +141,7 @@ function discordState(view) {
 function openSettings() {
   if (settingsWin && !settingsWin.isDestroyed()) { settingsWin.show(); settingsWin.focus(); return; }
   settingsWin = new BrowserWindow({
-    width: 380, height: 690, useContentSize: true, resizable: false, minimizable: false, maximizable: false, fullscreenable: false,
+    width: 380, height: 830, useContentSize: true, resizable: false, minimizable: false, maximizable: false, fullscreenable: false,
     title: 'NowPlaying 設定', backgroundColor: '#15161d', autoHideMenuBar: true, show: false,
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, sandbox: true },
   });
@@ -162,6 +166,7 @@ ipcMain.handle('settings:get', () => ({
   transparency: settings.transparency, blur: settings.blur,
   autostart: app.isPackaged && app.getLoginItemSettings(loginItem() || {}).openAtLogin,
   canAutostart: app.isPackaged,
+  spotify: settings.spotify,
   discord: settings.discord, discordAppId: settings.discordAppId,
   discordStatus: DISCORD_LABEL[discord.status] || discord.status,
 }));
@@ -171,6 +176,12 @@ ipcMain.on('settings:set-discord', (_event, { enabled, appId }) => {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(saveSettings, 300);
   discord.configure({ enabled: settings.discord, appId: settings.discordAppId });
+});
+ipcMain.on('settings:set-spotify', (_event, on) => {
+  settings.spotify = !!on;
+  if (settings.spotify) spotify.start(); else spotify.stop();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveSettings, 300);
 });
 ipcMain.on('settings:set-autostart', (_event, on) => {
   if (app.isPackaged) app.setLoginItemSettings({ ...loginItem(), openAtLogin: !!on });
@@ -270,13 +281,15 @@ app.whenReady().then(() => {
   updateTray();
   if (process.argv.includes('--settings')) openSettings();
   wnp.on('change', pushState);
+  spotify.on('change', pushState);
+  if (settings.spotify) spotify.start();
   // あとから出た最前面ウィンドウに隠されないよう、ときどき一番上へ戻す
   setInterval(() => { if (win && !win.isDestroyed() && win.isVisible()) win.moveTop(); }, 3000);
   // 再生位置は動き続けるので、変化がなくても 5 秒ごとに渡す
-  setInterval(() => discord.update(discordState(wnp.view())), 5000);
+  setInterval(() => discord.update(discordState(currentView())), 5000);
   discord.configure({ enabled: settings.discord, appId: settings.discordAppId });
   startServer();
 });
 
 app.on('window-all-closed', (e) => e.preventDefault());
-app.on('before-quit', () => discord.close());
+app.on('before-quit', () => { spotify.stop(); discord.close(); });

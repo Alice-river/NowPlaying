@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('np', {
   setDiscord: (enabled, appId) => ipcRenderer.send('settings:set-discord', { enabled: !!enabled, appId }),
   onDiscordStatus: (cb) => ipcRenderer.on('discord-status', (_event, label) => cb(label)),
   setAutostart: (on) => ipcRenderer.send('settings:set-autostart', !!on),
+  setSpotify: (on) => ipcRenderer.send('settings:set-spotify', !!on),
   setBlur: (on) => ipcRenderer.send('settings:set-blur', !!on),
   setTransparency: (value) => ipcRenderer.send('settings:set-transparency', value),
 });

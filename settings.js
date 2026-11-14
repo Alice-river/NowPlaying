@@ -26,7 +26,10 @@ document.getElementById('reset').addEventListener('click', () => {
   window.np.setBlur(true);
 });
 
-const dcOn = document.getElementById('dc-on');
+const spOn = document.getElementById('sp-on');
+spOn.addEventListener('change', () => window.np.setSpotify(spOn.checked));
+
+const dcOn =document.getElementById('dc-on');
 const dcId = document.getElementById('dc-id');
 const dcStatus = document.getElementById('dc-status');
 let dcTimer = null;
@@ -44,6 +47,7 @@ window.np.getSettings().then((s) => {
   blur.checked = s.blur;
   auto.checked = s.autostart;
   auto.disabled = !s.canAutostart; // 開発中 (exe でないとき) は変えられない
+  spOn.checked = s.spotify;
   dcOn.checked = s.discord;
   dcId.value = s.discordAppId;
   dcStatus.textContent = `状態: ${s.discordStatus}`;
